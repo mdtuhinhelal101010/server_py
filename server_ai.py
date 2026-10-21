@@ -139,9 +139,7 @@ Return ONLY valid JSON format, with no extra text or markdown formatting blocks,
 def advanced_clean_text(val):
     if not val:
         return ""
-    # মাল্টি-লাইন বা লাইন ব্রেক দূর করে স্পেস দিয়ে এক লাইনে রূপান্তর
     text = str(val).replace('\n', ' ').replace('\r', ' ')
-    # অতিরিক্ত বা ডাবল স্পেস ক্লিন করা
     text = re.sub(r'\s+', ' ', text)
     return text.strip()
 
@@ -149,7 +147,6 @@ def post_process_data(data):
     if not isinstance(data, dict):
         return data
 
-    # সব টেক্সট ফিল্ড থেকে অতিরিক্ত লাইন ব্রেক ও ময়লা পরিষ্কার করা
     for key, val in data.items():
         if isinstance(val, str):
             data[key] = advanced_clean_text(val)
@@ -172,7 +169,6 @@ def post_process_data(data):
             cleaned = re.sub(r'^(present\s*address[\s\d]*|permanent\s*address[\s\d]*|address\s*(line)?\s*\d*|line\s*\d*)\s*[:\-]?\s*', '', data[k], flags=re.IGNORECASE)
             data[k] = cleaned.strip()
             
-    # টাউন ও অ্যাড্রেস ওভারল্যাপ রোধ করার লজিক
     pob_town = data.get("pobTown", "")
     if pob_town:
         if data.get("pres_add2") and pob_town.lower() in data.get("pres_add2").lower():
@@ -190,7 +186,7 @@ async def extract_passport(file: UploadFile = File(...)):
         extracted_text = pytesseract.image_to_string(image)
         
         completion = client.chat.completions.create(
-            model="openai/gpt-oss-20b",
+            model="llama-3.3-70b-versatile",
             messages=[
                 {
                     "role": "user",
@@ -226,7 +222,7 @@ async def extract_pdf(file: UploadFile = File(...)):
             extracted_text = "PDF document uploaded for Indian Visa application."
 
         completion = client.chat.completions.create(
-            model="openai/gpt-oss-20b",
+            model="llama-3.3-70b-versatile",
             messages=[
                 {
                     "role": "user",
